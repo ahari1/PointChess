@@ -1,18 +1,17 @@
 package Pieces;
 
-public class Pawn {
+public class Pawn extends Piece{
 
-    private boolean color;
-    private int row;
-    private int col;
+    public boolean twoSteps;
+    
     //private 
 
 
-    public Pawn(boolean color, int row, int col){
-
+    public Pawn(boolean color){
+        
+        this.points=1;
         this.color=color;
-
-
+        twoSteps=true;        
     }
     
 }

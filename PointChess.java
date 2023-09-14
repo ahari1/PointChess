@@ -1,9 +1,40 @@
+import java.util.*;
+import Pieces.*;
 public class PointChess {
 
-    private int[][] board;
-    private int playerTurn=-1;
+    private Piece[][] boardP;
+    private String[][] boardS;
+    private int playerTurn=1;
 
 
+
+
+
+    public PointChess(){
+
+        boardSetup();
+
+
+    }
+
+
+
+    private void boardSetup(){
+
+        //Pawn Setup
+        for(int i=0;i<8;i++){
+            boardP[1][i]= new Pawn(true);
+            boardP[6][i]= new Pawn(false);
+
+            boardS[1][i]="♟︎";
+            boardS[6][i]="♙";
+        }
+
+        
+
+
+
+    }
 
 
 public class validMove{
@@ -34,33 +65,33 @@ public class validMove{
             return false;
         }
 
-        System.out.println(pos1);
-        System.out.println(pos2);
+        System.out.println(startCol);
+        System.out.println(startRow);
 
         switch(piece){
             case 1:
-                return pawnMove(start,end);
+                return pawnMove(startRow,startCol, endRow, endCol);
             
-            case 2:
-                return rookMove(start,end);
+            // case 2:
+            //     return rookMove(start,end);
 
-            case 3:
+            // case 3:
 
-                return knightMove(start,end);
+            //     return knightMove(start,end);
             
-            case 4:
+            // case 4:
 
-                return bishopMove(start,end);
+            //     return bishopMove(start,end);
 
-            case 5:
+            // case 5:
 
-                return queenMove(start,end);
+            //     return queenMove(start,end);
             
-            case 6:
+            // case 6:
 
-                return kingMove(start,end);
+            //     return kingMove(start,end);
         }
-
+        return false;
     }
 
 
@@ -77,7 +108,7 @@ public class validMove{
 
 
 
-    private static boolean pawnMove(String letter, String num, String end) {
+    private static boolean pawnMove(int startRow, int startCol, int endRow, int endCol) {
         
         
 
@@ -88,7 +119,7 @@ public class validMove{
     private static boolean kingMove(int stRow, int stCol, int endRow, int endCol){
 
 
-        
+        return true;
         
     }
 
