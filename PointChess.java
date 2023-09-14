@@ -1,6 +1,7 @@
 public class PointChess {
 
     private int[][] board;
+    private int playerTurn=-1;
 
 
 
@@ -23,8 +24,18 @@ public class validMove{
      */
     public static boolean validCheck(String start, String end, int piece){
         
-        int pos1=((int)start.charAt(0))-97;
-        int pos2=Integer.parseInt(start.substring(1))-1;
+        int startCol=((int)start.charAt(0))-97;
+        int startRow=Integer.parseInt(start.substring(1))-1;
+
+        int endCol=((int)end.charAt(0))-97;
+        int endRow=Integer.parseInt(end.substring(1))-1;
+
+        if(!boundaryCheck(startCol, startRow, endCol, endRow)) {
+            return false;
+        }
+
+        System.out.println(pos1);
+        System.out.println(pos2);
 
         switch(piece){
             case 1:
@@ -53,13 +64,32 @@ public class validMove{
     }
 
 
+    private static boolean boundaryCheck(int startRow, int startCol, int endRow, int endCol){
+        if(startRow>7 || startCol>7 || endRow>7 || endCol>7){
+            return false;
+        }
+        if(startRow<0 || startCol<0 || endRow<0 || endCol<0){
+            return false;
+        }
+
+        return true;
+    }
 
 
-    private static boolean pawnMove(String start, String end) {
+
+    private static boolean pawnMove(String letter, String num, String end) {
         
         
 
         return true;
+    }
+
+
+    private static boolean kingMove(int stRow, int stCol, int endRow, int endCol){
+
+
+        
+        
     }
 
 
