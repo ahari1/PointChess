@@ -5,6 +5,8 @@ public class PointChess {
     private Piece[][] boardP;
     private String[][] boardS;
     private int playerTurn=-1;//white is negative, black is positive
+    private String enPassantAval;
+    private Scanner console= new Scanner(System.in);
 
 
 
@@ -18,8 +20,6 @@ public class PointChess {
 
 
     }
-
-
 
     private void boardSetup(){
 
@@ -48,7 +48,40 @@ public class PointChess {
         boardS[0][7]= "♜";
         boardS[7][7]= "♖";
 
+        //knight setup
+        boardP[0][1]= new Knight(true);
+        boardP[7][1]= new Knight(false);
+        boardP[0][6]= new Knight(true);
+        boardP[7][6]= new Knight(false);
 
+        boardS[0][1]= "♞";
+        boardS[7][1]= "♘";
+        boardS[0][6]= "♞";
+        boardS[7][6]= "♘";
+
+
+        //bishop setup
+        boardP[0][2]= new Bishop(true);
+        boardP[7][2]= new Bishop(false);
+        boardP[0][5]= new Bishop(true);
+        boardP[7][5]= new Bishop(false);
+
+        boardS[0][2]= "♝";
+        boardS[7][2]= "♗";
+        boardS[0][5]= "♝";
+        boardS[7][5]= "♗";
+
+        //queen+king setup
+
+        boardP[0][3]= new Queen(true);
+        boardP[7][3]= new Queen(false);
+        boardP[0][4]= new King(true);
+        boardP[7][4]= new King(false);
+
+        boardS[0][3]= "♛";
+        boardS[7][3]= "♕";
+        boardS[0][4]= "♚";
+        boardS[7][4]= "♔";
 
 
 
@@ -63,19 +96,9 @@ public class PointChess {
             System.out.println();
         }
     }
-// public class validMove {
 
-    // private static final int pawn=1;
-    // private static final int rook=2;
-    // private static final int knight=3;
-    // private static final int bishop=4;
-    // private static final int queen=5;
-
-    // private static final int king=6;
-
-
-    public boolean validCheck(String start, String end, int piece){
-        
+    public int validCheck(String start, String end, int piece){
+        int made=0;
         int startCol=((int)start.charAt(0))-97;
         int startRow=Math.abs(Integer.parseInt(start.substring(1))-8);
     
@@ -83,17 +106,13 @@ public class PointChess {
         int endRow=Math.abs(Integer.parseInt(end.substring(1))-8);
 
         if(!boundaryCheck(startCol, startRow, endCol, endRow)) {
-            return false;
+            return 0;
         }
 
 
         switch(piece){
             case 1:
-                boolean made= pawnMove(startRow,startCol, endRow, endCol);
-                if(made){
-                    printBoard();
-                    return true;
-                }
+                made= pawnMove(startRow,startCol, endRow, endCol);
             
             // case 2:
             //     return rookMove(start,end);
@@ -110,10 +129,11 @@ public class PointChess {
 
             //     return queenMove(start,end);
             
-            case 6:
-                return true;//kingMove(start,end);
         }
-        return false;
+        if(made!=0){
+            printBoard();
+        }
+        return made;
 
     
     }
@@ -129,13 +149,11 @@ public class PointChess {
         return true;
     }
 
-
-
-    private boolean pawnMove(int startRow, int startCol, int endRow, int endCol) {
+    private int pawnMove(int startRow, int startCol, int endRow, int endCol) {
         
         Pawn curr;
         if(!(boardP[startRow][startCol] instanceof Pawn)){
-            return false;
+            return 0;
         } else{
             curr=(Pawn)boardP[startRow][startCol];
         }
@@ -152,22 +170,170 @@ public class PointChess {
                     boardS[endRow][endCol]=boardS[startRow][startCol];
                     boardS[startRow][startCol]="-";
                     curr.twoSteps=false;
-                } else{
-                    return false;
+
+
+                    /*
+                     * 
+                     * TODO
+                     * Check for promotion
+                     * 
+                     * 
+                     */
+
+                     if(endRow==0 || endRow==7){
+                    String response="";
+                    while(!response.equals("q") && !response.equals("r") && !response.equals("b") && !response.equals("k")){
+                        System.out.println("What would you like to promote to? (Q)ueen, (R)ook, (K)night, (B)ishop");
+                        response= console.next();
+                        if(!response.equals("q") && !response.equals("r") && !response.equals("b") && !response.equals("k")){
+                            System.out.println("Invalid input, please try again!");
+                        }
+
+                    }
                 }
+                } else{
+                    return 0;
+                }
+                enPassantAval="";
             } else if(stepCount==2){
 
+                if(curr.twoSteps && boardP[endRow][endCol]==null && boardP[endRow-playerTurn][endCol]==null){
+                    boardP[endRow][endCol]=curr;
+                    boardP[startRow][startCol]=null;
+                    boardS[endRow][endCol]=boardS[startRow][startCol];
+                    boardS[startRow][startCol]="-";
+                    curr.twoSteps=false;
+                    enPassantAval=Integer.toString(endRow)+","+Integer.toString(endCol);
+                } else{
+                    return 0;
+                }
+
+
+                
+            }
+        //capturing
+        } else if ((playerTurn*(endRow-startRow))==1 && Math.abs(endCol-startCol)==1){
+
+            //normal capture
+            if(boardP[endRow][endCol]!=null){
+                boolean currColor=curr.color;
+                boolean captureColor=boardP[endRow][endCol].color;
+                if(currColor==captureColor){
+                    return 0;
+                }
+                Piece prev=boardP[endRow][endCol];
+                boardP[endRow][endCol]=curr;
+                boardP[startRow][startCol]=null;
+                boardS[endRow][endCol]=boardS[startRow][startCol];
+                boardS[startRow][startCol]="-";
+                if(prev instanceof King){
+                    return -1;
+                }
+                
+                /* TODO
+                 * 
+                 * Need to add promotion part
+                 * 
+                 * 
+                 */
+
+
+                if(endRow==0 || endRow==7){
+                    String response="";
+                    while(!response.equals("q") && !response.equals("r") && !response.equals("b") && !response.equals("k")){
+                        System.out.println("What would you like to promote to? (Q)ueen, (R)ook, (K)night, (B)ishop");
+                        response= console.next();
+                        if(!response.equals("q") && !response.equals("r") && !response.equals("b") && !response.equals("k")){
+                            System.out.println("Invalid input, please try again!");
+                        }
+
+                    }
+                    boolean col=false;
+                    if(playerTurn>0){
+                        col=true;
+                    }
+                    if(response.equals("q")){
+                        boardP[endRow][endCol]=new Queen(col);
+                        if(playerTurn>0){
+                            boardS[endRow][endCol]="♛";
+                        } else{
+                            boardS[endRow][endCol]="♕";
+                        }
+                        
+                    }else if (response.equals("r")){
+                        boardP[endRow][endCol]=new Rook(col);
+                        if(playerTurn>0){
+                            boardS[endRow][endCol]="♜";
+                        } else{
+                            boardS[endRow][endCol]="♖";
+                        }
+                    }else if (response.equals("k")){
+                        boardP[endRow][endCol]=new Knight(col);
+                        if(playerTurn>0){
+                            boardS[endRow][endCol]="♞";
+                        } else{
+                            boardS[endRow][endCol]="♘";
+                        }
+                    }else{
+                        boardP[endRow][endCol]=new Bishop(col);
+                        if(playerTurn>0){
+                            boardS[endRow][endCol]="♝";
+                        } else{
+                            boardS[endRow][endCol]="♗";
+                        }
+                    }
+                }
+                
+            //enpassant
+            } else{
+
+                //right capture
+                if(endCol-startCol>0 && boardP[startRow][startCol+1] instanceof Pawn ){
+                    int possRow=(int)enPassantAval.charAt(0)-48;
+                    int possCol=(int)enPassantAval.charAt(2)-48;
+                    if(possRow!=startRow || possCol-1!=startCol|| possCol!=endCol){
+                        return 0;
+                    }
+                    boardP[endRow][endCol]=curr;
+                    boardP[startRow][startCol]=null;
+                    boardS[endRow][endCol]=boardS[startRow][startCol];
+                    boardS[startRow][startCol]="-";
+                    
+
+
+
+                //left capture
+                }else if(endCol-startCol<0 && boardP[startRow][startCol-1] instanceof Pawn ){
+
+                    int possRow=(int)enPassantAval.charAt(0)-48;
+                    int possCol=(int)enPassantAval.charAt(2)-48;
+                    if(possRow!=startRow || possCol+1!=startCol|| possCol!=endCol){
+                        return 0;
+                    }
+                    boardP[endRow][endCol]=curr;
+                    boardP[startRow][startCol]=null;
+                    boardP[startRow][endCol]=null;
+                    boardS[endRow][endCol]=boardS[startRow][startCol];
+                    boardS[startRow][startCol]="-";
+                    boardS[startRow][endCol]="-";
+
+                } else{
+                    return 0;
+                }
             }
 
-
-
+            enPassantAval="";
         }
+
+
 
         //capture
         playerTurn=playerTurn*-1;
         System.out.println("\n\n");
-        return true;
+        return 1;
     }
+
+
 
 
     private boolean kingMove(int stRow, int stCol, int endRow, int endCol){
