@@ -97,7 +97,7 @@ public class PointChess {
         }
     }
 
-    public int validCheck(String start, String end, int piece){
+    public int validCheck(String start, String end){
         int made=0;
         int startCol=((int)start.charAt(0))-97;
         int startRow=Math.abs(Integer.parseInt(start.substring(1))-8);
@@ -108,28 +108,24 @@ public class PointChess {
         if(!boundaryCheck(startCol, startRow, endCol, endRow)) {
             return 0;
         }
-
-
-        switch(piece){
-            case 1:
-                made= pawnMove(startRow,startCol, endRow, endCol);
-            
-            // case 2:
-            //     return rookMove(start,end);
-
-            // case 3:
-
-            //     return knightMove(start,end);
-            
-            // case 4:
-
-            //     return bishopMove(start,end);
-
-            // case 5:
-
-            //     return queenMove(start,end);
-            
+        int piece=1;
+        Piece pieces= boardP[startRow][startCol];
+        if(pieces==null){
+            return 0;
+        }else if(pieces instanceof Pawn){
+            made= pawnMove(startRow,startCol, endRow, endCol);
+        }else if(pieces instanceof King){
+            made= kingMove(startRow, startCol, endRow, endCol);
+        }else if(pieces instanceof Knight){
+            piece=3;
+        }else if(pieces instanceof Bishop){
+            piece=4;
+        }else if(pieces instanceof Queen){
+            piece=5;
+        }else{
+            piece=6;
         }
+        
         if(made!=0){
             printBoard();
         }
@@ -333,14 +329,30 @@ public class PointChess {
         return 1;
     }
 
+    private int kingMove(int stRow, int stCol, int endRow, int endCol){
+
+        King curr;
+        Piece other=boardP[endRow][endCol];
+        if(!(boardP[stRow][stCol] instanceof King)){
+            return 0;
+        } else{
+            curr=(King)boardP[stRow][stCol];
+        }
+        if(Math.abs(stRow-endRow)>1|| Math.abs(stCol-endCol)>1 ||(other!=null && curr.color==other.color)){
+            return 0;
+        }
+
+        if(other instanceof King){
+            return -1;
+        }
 
 
-
-    private boolean kingMove(int stRow, int stCol, int endRow, int endCol){
-
-
-        return true;
-        
+        boardP[endRow][endCol]=curr;
+        boardP[stRow][stCol]=null;
+        boardS[endRow][endCol]=boardS[stRow][stCol];
+        boardS[stRow][stCol]="-";
+        enPassantAval="";    
+        return 1;
     }
 
 
@@ -348,10 +360,5 @@ public class PointChess {
 //}
 
 
-
-
-
-
-
-    
+   
 }
