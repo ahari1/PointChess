@@ -292,11 +292,10 @@ public class PointChess {
                     }
                     boardP[endRow][endCol]=curr;
                     boardP[startRow][startCol]=null;
+                    boardP[startRow][endCol]=null;
                     boardS[endRow][endCol]=boardS[startRow][startCol];
                     boardS[startRow][startCol]="-";
-                    
-
-
+                    boardS[startRow][endCol]="-";
 
                 //left capture
                 }else if(endCol-startCol<0 && boardP[startRow][startCol-1] instanceof Pawn ){
