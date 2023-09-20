@@ -5,31 +5,34 @@ public class Test {
 
 
     public static void main(String args[]){
-        Scanner next= new Scanner(System.in);
-        PointChess testGame= new PointChess();
-        String response;
-        int player=-1;
-        int returns=5;
+        try (Scanner next = new Scanner(System.in)) {
+            PointChess testGame= new PointChess();
+            String response;
+            int player=-1;
+            int returns=5;
 
-        while(returns!=-1){
-            System.out.println("Enter valid move, separating positions by comma.");
-            try{
-                response=next.next();
-                String[] vals=response.split(",");
-                String init=vals[0];
-                String dest=vals[1];
-                returns=testGame.validCheck(init, dest);
-                player*=-1;
-            } catch (Exception e){
-                System.out.println("Invalid! Try again. ");
+            while(returns!=-1){
+                System.out.println("Enter valid move, separating positions by comma.");
+                try{
+                    response=next.next();
+                    String[] vals=response.split(",");
+                    String init=vals[0];
+                    String dest=vals[1];
+                    returns=testGame.validCheck(init, dest);
+                    if(returns>0){player*=-1;}
+                    else if(returns==-2){System.out.println("Invalid! Too many points in the way!");
+                    }
+                } catch (Exception e){
+                    System.out.println("Invalid! Try again. ");
+                }
+                
             }
-            
-        }
 
-        if(player>0){
-            System.out.println("Congrats! Black wins!");
-        }else{
-            System.out.println("Congrats! White wins!");
+            if(player>0){
+                System.out.println("Congrats! Black wins!");
+            }else{
+                System.out.println("Congrats! White wins!");
+            }
         }
 
 

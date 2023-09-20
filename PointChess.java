@@ -21,6 +21,15 @@ public class PointChess {
 
     }
 
+    // public boolean pieceChecker(){
+    //     int count=0;
+
+    //     for(int)
+
+
+    //     return count<=32;
+    // }
+
     private void boardSetup(){
 
         for(int i=0;i<8;i++){
@@ -98,6 +107,9 @@ public class PointChess {
     }
 
     public int validCheck(String start, String end){
+
+
+
         int made=0;
         int startCol=((int)start.charAt(0))-97;
         int startRow=Math.abs(Integer.parseInt(start.substring(1))-8);
@@ -109,15 +121,26 @@ public class PointChess {
             return 0;
         }
         int piece=1;
+        
         Piece pieces= boardP[startRow][startCol];
         if(pieces==null){
             return 0;
-        }else if(pieces instanceof Pawn){
+        }
+
+        boolean currColor=pieces.color;
+
+        if((currColor && playerTurn<0) || (!currColor && playerTurn>0)){
+            System.out.println("It's not your turn!");
+            return 0;
+        }
+
+        
+        if(pieces instanceof Pawn){
             made= pawnMove(startRow,startCol, endRow, endCol);
         }else if(pieces instanceof King){
             made= kingMove(startRow, startCol, endRow, endCol);
         }else if(pieces instanceof Knight){
-            piece=3;
+            made= knightMove(startRow, startCol, endRow, endCol);
         }else if(pieces instanceof Bishop){
             piece=4;
         }else if(pieces instanceof Queen){
@@ -126,7 +149,8 @@ public class PointChess {
             piece=6;
         }
         
-        if(made!=0){
+        if(made!=0 && made!=-2){
+            System.out.println(made);
             printBoard();
         }
         return made;
@@ -350,8 +374,136 @@ public class PointChess {
         boardP[stRow][stCol]=null;
         boardS[endRow][endCol]=boardS[stRow][stCol];
         boardS[stRow][stCol]="-";
-        enPassantAval="";    
+        enPassantAval="";  
+        playerTurn=playerTurn*-1;  
         return 1;
+    }
+
+    private int knightMove(int startRow, int startCol, int endRow, int endCol){
+        Knight curr;
+        Piece other=boardP[endRow][endCol];
+
+        if(!(boardP[startRow][startCol] instanceof Knight)){
+            return 0;
+        } else{
+            curr=(Knight)boardP[startRow][startCol];
+        }
+        int rowDiff=Math.abs(endRow-startRow);
+        int colDiff=Math.abs(endCol-startCol);
+        if(rowDiff>2 || colDiff>2 ||rowDiff==colDiff || rowDiff<1 || colDiff<1){
+            return 0;
+        }
+
+        if(rowDiff==1){
+
+
+            int totalPoints=0;
+
+            int route1=0;
+            int route2=0;
+
+            Piece route1First=boardP[endRow][(startCol+endCol)/2];
+            Piece route1Second=boardP[endRow][startCol];
+
+            Piece route2First=boardP[startRow][(startCol+endCol)/2];
+            Piece route2Second=boardP[startRow][endCol];
+
+            if(route1First!=null){route1+=route1First.points;}
+            if(route1Second!=null){route1+=route1First.points;}
+            totalPoints=route1;
+            if(route1>3){
+                if(route2First!=null){
+                    route2+=route2First.points;
+                }
+                if(route2Second!=null){
+                    route2+=route2Second.points;
+                }
+                totalPoints=route2;
+            }
+            if(totalPoints>3){
+                return 0;
+            }else{
+
+                boardP[endRow][endCol]=curr;
+                boardS[endRow][endCol]=boardS[startRow][startCol];
+                boardP[startRow][startCol]=null;
+                boardS[startRow][startCol]="-";
+            }
+
+        }else{ //rowDiff==2
+
+
+            /**
+             * 
+             * toCheck:
+             * 
+             * 
+             * [startCol][average of the two] and [startCol][endRow]
+             * 
+             * 
+             */
+
+
+
+             /*
+              *
+              the other way: [endCol][average of the two] and [endCol][startRow] 
+
+
+              */
+
+
+            int totalPoints=0;
+
+            int route1=0;
+            int route2=0;
+
+            Piece route1First=boardP[(endRow+startRow)/2][startCol];
+            Piece route1Second=boardP[endRow][startCol];
+
+            Piece route2First=boardP[(startRow+endRow)/2][endCol];
+            Piece route2Second=boardP[startRow][endCol];
+
+            if(route1First!=null){route1+=route1First.points;}
+            if(route1Second!=null){route1+=route1First.points;}
+            totalPoints=route1;
+            if(route1>3){
+                if(route2First!=null){
+                    route2+=route2First.points;
+                }
+                if(route2Second!=null){
+                    route2+=route2Second.points;
+                }
+                totalPoints=route2;
+            }
+            if(totalPoints>3){
+                return 0;
+            }else{
+
+                boardP[endRow][endCol]=curr;
+                boardS[endRow][endCol]=boardS[startRow][startCol];
+                boardP[startRow][startCol]=null;
+                boardS[startRow][startCol]="-";
+            }
+
+
+
+        }
+
+
+
+        if(other instanceof King){
+            return -1;
+        }
+        enPassantAval="";
+        playerTurn*=-1;
+
+
+
+        return 1;
+
+
+
     }
 
 
