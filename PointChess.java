@@ -120,7 +120,6 @@ public class PointChess {
         if(!boundaryCheck(startCol, startRow, endCol, endRow)) {
             return 0;
         }
-        int piece=1;
         
         Piece pieces= boardP[startRow][startCol];
         if(pieces==null){
@@ -142,14 +141,14 @@ public class PointChess {
         }else if(pieces instanceof Knight){
             made= knightMove(startRow, startCol, endRow, endCol);
         }else if(pieces instanceof Bishop){
-            piece=4;
+            
         }else if(pieces instanceof Queen){
-            piece=5;
+            
         }else{
-            piece=6;
+            made= rookMove(startRow, startCol, endRow, endCol);
         }
         
-        if(made!=0 && made!=-2){
+        if(made!=0 && made!=-2 && made !=3){
             System.out.println(made);
             printBoard();
         }
@@ -382,11 +381,14 @@ public class PointChess {
     private int knightMove(int startRow, int startCol, int endRow, int endCol){
         Knight curr;
         Piece other=boardP[endRow][endCol];
-
+        
         if(!(boardP[startRow][startCol] instanceof Knight)){
             return 0;
         } else{
             curr=(Knight)boardP[startRow][startCol];
+        }
+        if(other!=null && other.color==curr.color){
+            return 0;
         }
         int rowDiff=Math.abs(endRow-startRow);
         int colDiff=Math.abs(endCol-startCol);
@@ -421,7 +423,7 @@ public class PointChess {
                 totalPoints=route2;
             }
             if(totalPoints>3){
-                return 0;
+                return 2;
             }else{
 
                 boardP[endRow][endCol]=curr;
@@ -477,7 +479,7 @@ public class PointChess {
                 totalPoints=route2;
             }
             if(totalPoints>3){
-                return 0;
+                return 2;
             }else{
 
                 boardP[endRow][endCol]=curr;
@@ -504,6 +506,73 @@ public class PointChess {
 
 
 
+    }
+
+    private int rookMove(int startRow, int startCol, int endRow, int endCol){
+        Rook curr;
+        Piece other=boardP[endRow][endCol];
+        if(!(boardP[startRow][startCol] instanceof Rook)){
+            return 0;
+        } else{
+            curr=(Rook) boardP[startRow][startCol];
+        }
+        if(other!=null && other.color==curr.color){
+            return 0;
+        }
+        int rowDiff=endRow-startRow;
+        int colDiff=endCol-startCol;
+        if(colDiff!=0 && rowDiff!=0){
+            return 0;
+        } else if(colDiff!=0){ //horizontal movement
+            int counter=1;
+            int points=0;
+            if(endCol<startCol){
+                counter=-1;
+            }
+            for( int i=startCol; i!=endCol; i=i+counter){
+                Piece currP= boardP[startRow][i];
+                if(currP instanceof Pawn && currP.color==curr.color){
+                    return 3;
+                }
+                if(currP!=null && currP.color!=curr.color){
+                    points+=boardP[startRow][i].points;
+                }
+            }
+            if(points>5){
+                return 2;
+            } else{
+                boardP[endRow][endCol]=curr;
+                boardP[startRow][startCol]=null;
+                boardS[endRow][endCol]=boardS[startRow][startCol];
+                boardS[startRow][startCol]="-";
+            }
+
+        } else{ //vertical movement
+            int counter=1;
+            int points=0;
+            if(endRow<startRow){counter=-1;}
+            for(int i=startRow;i!=endRow;i+=counter){
+                Piece currP=boardP[i][startCol];
+                if(currP instanceof Pawn && currP.color==curr.color){
+                    return 3;
+                } else if(currP!=null && currP.color!=curr.color){
+                    points+=boardP[i][startCol].points;
+                }
+            }
+            if(points>5){ return 2;} else{
+                boardP[endRow][endCol]=curr;
+                boardP[startRow][startCol]=null;
+                boardS[endRow][endCol]=boardS[startRow][startCol];
+                boardS[startRow][startCol]="-";
+            }
+
+
+        }
+        if(other instanceof King){
+            return -1;
+        }
+        playerTurn*=-1;
+        return 1;   
     }
 
 
