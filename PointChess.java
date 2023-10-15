@@ -9,9 +9,6 @@ public class PointChess {
     private Scanner console= new Scanner(System.in);
 
 
-
-
-
     public PointChess(){
         boardP= new Piece[8][8];
         boardS= new String[8][8];
@@ -21,15 +18,6 @@ public class PointChess {
 
     }
 
-    // public boolean pieceChecker(){
-    //     int count=0;
-
-    //     for(int)
-
-
-    //     return count<=32;
-    // }
-
     private void boardSetup(){
 
         for(int i=0;i<8;i++){
@@ -37,7 +25,7 @@ public class PointChess {
                 boardS[i][j]="-";
             }
         }
-        
+
         for(int i=0;i<8;i++){
             boardP[1][i]= new Pawn(true);
             boardP[6][i]= new Pawn(false);
@@ -113,14 +101,14 @@ public class PointChess {
         int made=0;
         int startCol=((int)start.charAt(0))-97;
         int startRow=Math.abs(Integer.parseInt(start.substring(1))-8);
-    
+
         int endCol=((int)end.charAt(0))-97;
         int endRow=Math.abs(Integer.parseInt(end.substring(1))-8);
 
         if(!boundaryCheck(startCol, startRow, endCol, endRow)) {
             return 0;
         }
-        
+
         Piece pieces= boardP[startRow][startCol];
         if(pieces==null){
             return 0;
@@ -133,7 +121,7 @@ public class PointChess {
             return 0;
         }
 
-        
+
         if(pieces instanceof Pawn){
             made= pawnMove(startRow,startCol, endRow, endCol);
         }else if(pieces instanceof King){
@@ -141,20 +129,19 @@ public class PointChess {
         }else if(pieces instanceof Knight){
             made= knightMove(startRow, startCol, endRow, endCol);
         }else if(pieces instanceof Bishop){
-            
+            made= bishopMove(startRow, startCol, endRow, endCol);
         }else if(pieces instanceof Queen){
-            
+            made= queenMove(startRow, startCol, endRow, endCol);
         }else{
             made= rookMove(startRow, startCol, endRow, endCol);
         }
-        
-        if(made!=0 && made!=-2 && made !=3){
-            System.out.println(made);
+
+        if(made==1 ||made==-1){
             printBoard();
         }
         return made;
 
-    
+
     }
 
     private boolean boundaryCheck(int startRow, int startCol, int endRow, int endCol){
@@ -169,7 +156,7 @@ public class PointChess {
     }
 
     private int pawnMove(int startRow, int startCol, int endRow, int endCol) {
-        
+
         Pawn curr;
         if(!(boardP[startRow][startCol] instanceof Pawn)){
             return 0;
@@ -177,6 +164,9 @@ public class PointChess {
             curr=(Pawn)boardP[startRow][startCol];
         }
 
+        if(startRow==endRow && startCol== endCol){
+            return 0;
+        }
 
         //linear
         if(playerTurn*(endCol-startCol)==0){
@@ -192,11 +182,11 @@ public class PointChess {
 
 
                     /*
-                     * 
+                     *
                      * TODO
                      * Check for promotion
-                     * 
-                     * 
+                     *
+                     *
                      */
 
                      if(endRow==0 || endRow==7){
@@ -228,7 +218,7 @@ public class PointChess {
                 }
 
 
-                
+
             }
         //capturing
         } else if ((playerTurn*(endRow-startRow))==1 && Math.abs(endCol-startCol)==1){
@@ -248,12 +238,12 @@ public class PointChess {
                 if(prev instanceof King){
                     return -1;
                 }
-                
+
                 /* TODO
-                 * 
+                 *
                  * Need to add promotion part
-                 * 
-                 * 
+                 *
+                 *
                  */
 
 
@@ -278,7 +268,7 @@ public class PointChess {
                         } else{
                             boardS[endRow][endCol]="♕";
                         }
-                        
+
                     }else if (response.equals("r")){
                         boardP[endRow][endCol]=new Rook(col);
                         if(playerTurn>0){
@@ -302,7 +292,6 @@ public class PointChess {
                         }
                     }
                 }
-                
             //enpassant
             } else{
 
@@ -343,8 +332,6 @@ public class PointChess {
             enPassantAval="";
         }
 
-
-
         //capture
         playerTurn=playerTurn*-1;
         System.out.println("\n\n");
@@ -360,7 +347,8 @@ public class PointChess {
         } else{
             curr=(King)boardP[stRow][stCol];
         }
-        if(Math.abs(stRow-endRow)>1|| Math.abs(stCol-endCol)>1 ||(other!=null && curr.color==other.color)){
+        if(Math.abs(stRow-endRow)>1|| Math.abs(stCol-endCol)>1 ||(other!=null &&
+         curr.color==other.color || (stRow-endRow==0 && stCol-endCol==0))){
             return 0;
         }
 
@@ -373,15 +361,15 @@ public class PointChess {
         boardP[stRow][stCol]=null;
         boardS[endRow][endCol]=boardS[stRow][stCol];
         boardS[stRow][stCol]="-";
-        enPassantAval="";  
-        playerTurn=playerTurn*-1;  
+        enPassantAval="";
+        playerTurn=playerTurn*-1;
         return 1;
     }
 
     private int knightMove(int startRow, int startCol, int endRow, int endCol){
         Knight curr;
         Piece other=boardP[endRow][endCol];
-        
+
         if(!(boardP[startRow][startCol] instanceof Knight)){
             return 0;
         } else{
@@ -392,7 +380,8 @@ public class PointChess {
         }
         int rowDiff=Math.abs(endRow-startRow);
         int colDiff=Math.abs(endCol-startCol);
-        if(rowDiff>2 || colDiff>2 ||rowDiff==colDiff || rowDiff<1 || colDiff<1){
+        if(rowDiff>2 || colDiff>2 ||rowDiff==colDiff || rowDiff<1 || colDiff<1 ||
+        (rowDiff==0 && colDiff==0)){
             return 0;
         }
 
@@ -436,20 +425,20 @@ public class PointChess {
 
 
             /**
-             * 
+             *
              * toCheck:
-             * 
-             * 
+             *
+             *
              * [startCol][average of the two] and [startCol][endRow]
-             * 
-             * 
+             *
+             *
              */
 
 
 
              /*
               *
-              the other way: [endCol][average of the two] and [endCol][startRow] 
+              the other way: [endCol][average of the two] and [endCol][startRow]
 
 
               */
@@ -521,7 +510,7 @@ public class PointChess {
         }
         int rowDiff=endRow-startRow;
         int colDiff=endCol-startCol;
-        if(colDiff!=0 && rowDiff!=0){
+        if((colDiff!=0 && rowDiff!=0) || (colDiff==0 && rowDiff==0)){
             return 0;
         } else if(colDiff!=0){ //horizontal movement
             int counter=1;
@@ -572,13 +561,135 @@ public class PointChess {
             return -1;
         }
         playerTurn*=-1;
-        return 1;   
+        return 1;
     }
 
+    private int bishopMove(int startRow, int startCol, int endRow, int endCol){
+        Bishop curr;
+        Piece other=boardP[endRow][endCol];
+
+        if(!(boardP[startRow][startCol] instanceof Bishop)){
+            return 0;
+        } else{
+            curr=(Bishop) boardP[startRow][startCol];
+        }
+        if(other!=null && other.color==curr.color){
+            return 0;
+        }
+
+        int rowChange= endRow-startRow;
+        int colChange= endCol-startCol;
+
+        int actRow=startRow;
+        int actCol= startCol;
+
+        if(Math.abs(rowChange)!=Math.abs(colChange)){
+            return 0;
+        }
+
+        int rowCounter=0;
+        int colCounter=0;
+
+        if(rowChange>0){
+            rowCounter++;
+        } else{
+            rowCounter--;
+        }
+        if (colChange>0){
+            colCounter++;
+        } else{
+            colCounter--;
+        }
+        int totalPoints=0;
+        while(startRow!=endRow && startCol!=endCol){
+            if(boardP[startRow][startCol]!= null && boardP[startRow][startCol].color!=curr.color){
+                totalPoints+=boardP[startRow][startCol].points;
+            }
+            if(boardP[startRow][startCol] instanceof Pawn && boardP[startRow][startCol].color==curr.color){
+                return 3;
+            }
+            startRow+=rowCounter;
+            startCol+=colCounter;
+            if(totalPoints>curr.points){
+                return 2;
+            }
+        }
+
+        boardP[endRow][endCol]=curr;
+        boardP[actRow][actCol]=null;
+        boardS[endRow][endCol]=boardS[actRow][actCol];
+        boardS[actRow][actCol]="-";
 
 
-//}
+        if(other instanceof King){
+            return -1;
+        }
+        playerTurn*=-1;
+        return 1;
+    }
 
+    private int queenMove(int startRow, int startCol, int endRow, int endCol){
 
-   
+        Queen curr;
+        Piece other=boardP[endRow][endCol];
+        if(!(boardP[startRow][startCol] instanceof Queen)){
+            return 0;
+        } else{
+            curr=(Queen) boardP[startRow][startCol];
+        }
+
+        if(other!=null && other.color==curr.color){
+            return 0;
+        }
+
+        int rowChange= endRow-startRow;
+        int colChange= endCol-startCol;
+
+        int actRow=startRow;
+        int actCol= startCol;
+        if(Math.abs(rowChange)!=Math.abs(colChange)){
+            if((rowChange!=0 && colChange!=0)    ){
+                return 0;
+            }
+        }
+        int rowCounter=0;
+        int colCounter=0;
+
+        if(rowChange>0){
+            rowCounter++;
+        } else if(rowChange<0){
+            rowCounter--;
+        }
+        if (colChange>0){
+            colCounter++;
+        } else if(colChange<0){
+            colCounter--;
+        }
+        int totalPoints=0;
+        while(startRow!=endRow || startCol!=endCol){
+            if(boardP[startRow][startCol]!= null && boardP[startRow][startCol].color!=curr.color){
+                totalPoints+=boardP[startRow][startCol].points;
+            }
+            if(boardP[startRow][startCol] instanceof Pawn && boardP[startRow][startCol].color==curr.color){
+                return 3;
+            }
+            startRow+=rowCounter;
+            startCol+=colCounter;
+            if(totalPoints>curr.points){
+                return 2;
+            }
+        }
+
+        boardP[endRow][endCol]=curr;
+        boardP[actRow][actCol]=null;
+        boardS[endRow][endCol]=boardS[actRow][actCol];
+        boardS[actRow][actCol]="-";
+
+        if(other instanceof King){
+            return -1;
+        }
+        playerTurn*=-1;
+        return 1;
+    }
+
 }

@@ -1,8 +1,5 @@
 import java.util.Scanner;
-public class Test {
-
-
-
+public class Client {
 
     public static void main(String args[]){
         try (Scanner next = new Scanner(System.in)) {
@@ -25,7 +22,7 @@ public class Test {
                 } catch (Exception e){
                     System.out.println("Invalid! Try again. ");
                 }
-                
+
             }
 
             if(player>0){
@@ -64,5 +61,5 @@ public class Test {
         // System.out.println(testGame.validCheck("f7","e8"));
 
     }
-    
+
 }
