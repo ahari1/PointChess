@@ -10,8 +10,13 @@ For game-balancing purposes, pieces are not allowed to traverse through their si
 This requires players to be more wary of what moves they are making as the king can be captured through other pieces. 
 
 Piece Point Values:
-Queen: 9 pts \n
+
+Queen: 9 pts
+
 Rook: 5 pts
+
 Knight/Bishop: 3pts
+
 Pawn: 1 pts
+
 King: 0 pts
